@@ -12,7 +12,7 @@ public class Main {
 			final Socket socket = new Socket("127.0.0.1", 5000);
 			final InputStream is = socket.getInputStream();
 			final OutputStream os = socket.getOutputStream();
-			System.out.println("Введите логин: ");
+			System.out.println("Р’РІРµРґРёС‚Рµ Р»РѕРіРёРЅ: ");
 			final String login = scanner.nextLine();
 			
 			Thread th = new Thread() {
@@ -36,8 +36,8 @@ public class Main {
 			};
 			th.setDaemon(true);
 			th.start();
-			
-			System.out.println(login + " вошёл в чат. Приветствуем!");
+
+			System.out.println(login + " РІРѕС€С‘Р» РІ С‡Р°С‚. РџСЂРёРІРµС‚СЃС‚РІСѓРµРј!");
 			
 			try 
 			{
@@ -63,7 +63,7 @@ public class Main {
 					
 					m.writeToStream(os);
 				}
-				System.out.println(login + " вышел из чата.");
+				System.out.println(login + " РІС‹С€РµР» РёР· С‡Р°С‚Р°.");
 			} finally {
 				th.interrupt();
 				socket.close();

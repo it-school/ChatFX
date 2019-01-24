@@ -13,15 +13,50 @@ public class Message implements Serializable {
 	public boolean isFile;
 	public transient String text;
 	public transient String path;
+
+	public static Message readFromStream(InputStream in)
+			throws IOException, ClassNotFoundException
+	{
+		if (in.available() <= 0)
+		{
+			return null;
+		}
+
+		DataInputStream ds = new DataInputStream(in);
+		int len = ds.readInt();
+		byte[] packet = new byte[len];
+		ds.read(packet);
+
+		ByteArrayInputStream bs = new ByteArrayInputStream(packet);
+		ObjectInputStream os = new ObjectInputStream(bs);
+		try
+		{
+			Message msg = (Message) os.readObject();
+			if (!msg.isFile)
+			{
+				msg.text = (String) os.readUTF();
+			}
+			else
+			{
+				// Ñ‡Ñ‚ÐµÐ½Ð¸Ðµ ÑÐ¾Ð´ÐµÑ€Ð¶Ð¸Ð¼Ð¾Ð³Ð¾ Ñ„Ð°Ð¹Ð»Ð°
+			}
+
+			return msg;
+		}
+		finally
+		{
+			os.close();
+		}
+	}
 	
 	@Override
 	public String toString() {
 		return new StringBuilder()
 			.append("[")
 			.append(date.toString())
-			.append(", Îò: ")
+				.append(", ÐžÑ‚: ")
 			.append(from)
-			.append(", äëÿ: ")
+				.append(", Ð´Ð»Ñ: ")
 			.append(to)
 			.append("] ")
 			.append(text)
@@ -35,49 +70,22 @@ public class Message implements Serializable {
 		ObjectOutputStream os = new ObjectOutputStream(bs);
 		try {
 			os.writeObject(this);
-			
+
 			if ( ! isFile) {
 				os.writeUTF(text);
 			} else {
-				// çàïèñü ñîäåðæèìîãî ôàéëà
+				// Ð·Ð°Ð¿Ð¸ÑÑŒ ÑÐ¾Ð´ÐµÑ€Ð¶Ð¸Ð¼Ð¾Ð³Ð¾ Ñ„Ð°Ð¹Ð»Ð°
 			}
 		} finally {
 			os.flush();
 			os.close();
 		}
-		
+
 		byte[] packet = bs.toByteArray();
-		
+
 		DataOutputStream ds = new DataOutputStream(out);
 		ds.writeInt(packet.length);
 		ds.write(packet);
 		ds.flush();
-	}
-	
-	public static Message readFromStream(InputStream in) 
-		throws IOException, ClassNotFoundException
-	{
-		if (in.available() <= 0)
-			return null;
-		
-		DataInputStream ds = new DataInputStream(in);
-		int len = ds.readInt();
-		byte[] packet = new byte[len];
-		ds.read(packet);
-		
-		ByteArrayInputStream bs = new ByteArrayInputStream(packet);
-		ObjectInputStream os = new ObjectInputStream(bs);
-		try {
-			Message msg = (Message) os.readObject();
-			if ( ! msg.isFile) {
-				msg.text = (String) os.readUTF();
-			} else {
-				// ÷òåíèå ñîäåðæèìîãî ôàéëà
-			}
-			
-			return msg;
-		} finally {
-			os.close();
-		}
 	}
 }
